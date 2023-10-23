@@ -5,6 +5,7 @@ import (
 	"sync"
 	"sync/atomic"
 	"testing"
+	"time"
 )
 
 func TestNew(t *testing.T) {
@@ -62,8 +63,16 @@ func TestNew3(t *testing.T) {
 	assert.Equal(t, result, int32(10000))
 }
 
+func timer(b *testing.B) func() {
+	var start = time.Now()
+	return func() {
+		b.Logf("%s took %v\n", b.Name(), time.Since(start))
+	}
+}
+
 // ~10% Better
 func BenchmarkNew(b *testing.B) {
+	defer timer(b)()
 	var box = New(0)
 
 	for i := 0; i < b.N; i++ {
@@ -80,6 +89,7 @@ func BenchmarkNew(b *testing.B) {
 
 // Worse
 func BenchmarkNew2(b *testing.B) {
+	defer timer(b)()
 	var value = atomic.Int32{}
 	var waitGroup = sync.WaitGroup{}
 
@@ -95,6 +105,7 @@ func BenchmarkNew2(b *testing.B) {
 }
 
 func BenchmarkNew3(b *testing.B) {
+	defer timer(b)()
 	var value = make(chan int32, 1)
 	var waitGroup = sync.WaitGroup{}
 
