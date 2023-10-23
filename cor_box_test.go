@@ -36,3 +36,23 @@ func BenchmarkNew2(b *testing.B) {
 
 	waitGroup.Wait()
 }
+
+func BenchmarkNew3(b *testing.B) {
+	var value = make(chan int32, 1)
+	var waitGroup = sync.WaitGroup{}
+
+	value <- 0
+
+	for i := 0; i < b.N; i++ {
+		waitGroup.Add(1)
+		go func() {
+			var acc = <-value
+			acc += 1
+			value <- acc
+			waitGroup.Done()
+		}()
+	}
+
+	waitGroup.Wait()
+	<-value
+}
