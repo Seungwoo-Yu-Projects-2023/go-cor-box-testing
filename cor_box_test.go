@@ -70,7 +70,6 @@ func timer(b *testing.B) func() {
 	}
 }
 
-// ~10% Better
 func BenchmarkNew(b *testing.B) {
 	defer timer(b)()
 	var box = New(0)
@@ -87,7 +86,6 @@ func BenchmarkNew(b *testing.B) {
 	box.Get()
 }
 
-// Worse
 func BenchmarkNew2(b *testing.B) {
 	defer timer(b)()
 	var value = atomic.Int32{}
