@@ -29,16 +29,12 @@ func (c *CoRBox[T]) Get() T {
 	var changes = c.changes
 	c.changes = []func(waitGroup *sync.WaitGroup, value *T){}
 
-	c.mutex.Unlock()
-
 	for len(changes) > 0 {
 		waitGroup.Add(1)
 		changes[0](&waitGroup, &result)
 		changes = changes[1:]
 		waitGroup.Wait()
 	}
-
-	c.mutex.Lock()
 
 	c.value = result
 
